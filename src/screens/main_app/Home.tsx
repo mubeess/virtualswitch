@@ -102,11 +102,12 @@ export default function Home() {
 
         <FlatList
           data={filteredPosts}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <PostItem
               handlePostPress={handlePostPress}
               item={item}
               isSelected={selectedPost?.id === item?.id}
+              index={index}
             />
           )}
           keyExtractor={(item) => item.id.toString()}
