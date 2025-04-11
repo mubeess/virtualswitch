@@ -52,7 +52,7 @@ const PostItem = ({
     <AnimatedTouchableOpacity
       entering={FadeInDown.delay(entryDelay).springify()}
       style={cardStyle}
-      className={`mb-4 rounded-lg shadow-md ${
+      className={`mb-4 rounded-lg shadow-md border-t border-t-blue-900 ${
         isSelected ? 'bg-blue-50 border-l-4 border-blue-500' : 'bg-white'
       }`}
       onPress={() => handlePostPress(item)}
@@ -62,13 +62,15 @@ const PostItem = ({
         <View className="flex-row items-center justify-between">
           <Text
             className="text-lg font-semibold text-black-800 flex-1 mr-2"
-            numberOfLines={isSelected ? undefined : 1}
+            numberOfLines={isSelected ? undefined : 2}
           >
             {item.title}
           </Text>
           <Text className="text-sm text-blue-600 font-medium">#{item.id}</Text>
         </View>
-
+        {!isSelected && (
+          <Text className="text-blue-900 font-bold text-[12px]">Tap to read more</Text>
+        )}
         {isSelected ? (
           <AnimatedView style={expandStyle} className="mt-3 w-full">
             <Text

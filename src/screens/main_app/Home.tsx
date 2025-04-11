@@ -68,11 +68,10 @@ export default function Home() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#f9f9f9]">
-      <View className="px-4 py-4">
-        <View className="flex-row justify-between items-center mb-6">
-          <Text className="text-2xl font-bold text-black">Posts</Text>
-        </View>
-
+      <View className="flex-row justify-between p-[20px] items-center mb-6 bg-blue-900">
+        <Text className="text-2xl font-100 text-white mt-[30px]">Posts</Text>
+      </View>
+      <View className="px-4 py-4 ">
         <View className="flex-row items-center bg-white rounded-lg px-3 py-[10px] h-[40px] mb-4 border border-gray-200">
           <SearchIcon />
           <TextInput
