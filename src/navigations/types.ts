@@ -1,6 +1,3 @@
-
-    export type RootStackParamList = {
-    Login: undefined;
-    Dashboard: undefined;
-  };
-  
+export type RootStackParamList = {
+  Home: undefined;
+};
