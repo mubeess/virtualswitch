@@ -1,19 +1,49 @@
-import { View, Text, SafeAreaView, TextInput, FlatList, ActivityIndicator } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  SafeAreaView,
+  TextInput,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
+import React, { useEffect, useState, useDeferredValue, useMemo } from 'react';
 import { usePost } from '@virtualswitch/hooks/usePost';
 import { Post } from '@virtualswitch/api/types';
 import PostItem from '@virtualswitch/components/PostItem';
 
+import { SearchIcon } from '@assets/svg';
+
 export default function Home() {
   const { allPost: posts, getAllPosts, loading, error } = usePost();
-
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const deferredSearchQuery = useDeferredValue(searchQuery);
 
   useEffect(() => {
     getAllPosts();
   }, []);
+
+  const filteredPosts = useMemo(() => {
+    if (!posts) return [];
+
+    if (!deferredSearchQuery.trim()) {
+      return posts;
+    }
+
+    const query = deferredSearchQuery.toLowerCase().trim();
+    return posts.filter((post) => {
+      return post.title?.toLowerCase().includes(query) || post.body?.toLowerCase().includes(query);
+    });
+  }, [posts, deferredSearchQuery]);
+
   const handlePostPress = (post: Post) => {
     setSelectedPost(selectedPost?.id === post.id ? null : post);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery('');
   };
 
   if (loading) {
@@ -34,6 +64,7 @@ export default function Home() {
       </View>
     );
   }
+  const isSearching = searchQuery !== deferredSearchQuery;
 
   return (
     <SafeAreaView className="flex-1 bg-[#f9f9f9]">
@@ -42,20 +73,49 @@ export default function Home() {
           <Text className="text-2xl font-bold text-black">Posts</Text>
         </View>
 
+        <View className="flex-row items-center bg-white rounded-lg px-3 py-[10px] h-[40px] mb-4 border border-gray-200">
+          <SearchIcon />
+          <TextInput
+            className="flex-1 ml-2 text-black h-[40px]"
+            placeholder="Search posts..."
+            placeholderTextColor="#9ca3af"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={clearSearch}>
+              <Text className="text-blue-500">Clear</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {deferredSearchQuery.trim() !== '' && (
+          <View className="flex-row items-center mb-2">
+            <Text className="text-gray-500">
+              Found {filteredPosts.length} result{filteredPosts.length !== 1 ? 's' : ''}
+            </Text>
+            {isSearching && (
+              <ActivityIndicator size="small" color="#4A90E2" style={{ marginLeft: 8 }} />
+            )}
+          </View>
+        )}
+
         <FlatList
-          data={posts}
+          data={filteredPosts}
           renderItem={({ item }) => (
             <PostItem
               handlePostPress={handlePostPress}
               item={item}
-              isSelected={selectedPost?.id == item?.id}
+              isSelected={selectedPost?.id === item?.id}
             />
           )}
           keyExtractor={(item) => item.id.toString()}
           contentContainerClassName="pb-6"
           ListEmptyComponent={
             <View className="py-10 items-center">
-              <Text className="text-gray-500">No posts found</Text>
+              <Text className="text-gray-500">
+                {deferredSearchQuery.trim() !== '' ? 'No matching posts found' : 'No posts found'}
+              </Text>
             </View>
           }
         />
